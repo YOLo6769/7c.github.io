@@ -1,0 +1,174 @@
+/*
+ * style.css
+ * Plik stylów dla Anonimowego Komunikatora
+ */
+
+/* === Podstawowe style i tło strony === */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e9ebee; /* Lekko szare tło a'la Facebook */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden; /* Zapobiega pojawieniu się paska przewijania dla całego body */
+}
+
+/* === Kontener Główny Czat === */
+#chat-container {
+    width: 95%;
+    max-width: 650px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Ładniejszy cień */
+    display: flex;
+    flex-direction: column;
+    height: 90vh; /* Większa wysokość, lepsze wykorzystanie ekranu */
+    min-height: 400px;
+}
+
+/* === Historia Wiadomości (Obszar Przewijany) === */
+#messages-history {
+    flex-grow: 1;
+    padding: 20px 15px;
+    overflow-y: auto;
+    border-bottom: 1px solid #f0f0f0;
+    /* Pasek przewijania w stylu WebKit (Chrome, Safari) */
+    scrollbar-width: thin;
+    scrollbar-color: #ccd0d5 #f0f0f0;
+}
+
+#messages-history::-webkit-scrollbar {
+    width: 8px;
+}
+
+#messages-history::-webkit-scrollbar-thumb {
+    background-color: #ccd0d5;
+    border-radius: 4px;
+}
+
+
+/* === Wiadomości Indywidualne === */
+.message-wrapper {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 75%;
+    word-wrap: break-word;
+    box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.1);
+    line-height: 1.4;
+}
+
+/* Wiadomość Wysłana Przez Mnie (Prawa Strona) */
+.message-me {
+    background-color: #0084ff; /* Żywszy niebieski */
+    color: white;
+    margin-left: auto; /* Wyrównanie do prawej */
+    border-bottom-right-radius: 4px; /* Ostrzejszy róg przy nadawcy */
+}
+
+/* Wiadomość Od Innego Użytkownika (Lewa Strona) */
+.message-other {
+    background-color: #f0f2f5; /* Jasnoszary */
+    color: #1c1e21;
+    margin-right: auto; /* Wyrównanie do lewej */
+    border-bottom-left-radius: 4px; /* Ostrzejszy róg przy nadawcy */
+}
+
+/* Etykieta Anonimowego Nadawcy */
+.message-sender {
+    display: block;
+    font-size: 0.7em;
+    font-weight: 600; /* Półgruby */
+    margin-bottom: 3px;
+    color: #495057;
+}
+
+/* Wiadomości Systemowe/Informacyjne */
+.system-message {
+    text-align: center;
+    font-size: 0.85em;
+    color: #6c757d;
+    margin: 15px 0;
+    padding: 5px 10px;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* === Obszar Wprowadzania Tekstu === */
+#input-area {
+    display: flex;
+    padding: 10px 15px;
+    border-top: 1px solid #e5e5e5;
+    align-items: center;
+}
+
+#message-input {
+    flex-grow: 1;
+    padding: 12px 18px;
+    border: 1px solid #ced4da;
+    border-radius: 24px; /* Bardziej zaokrąglony */
+    margin-right: 10px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    font-size: 1em;
+}
+
+#message-input:focus {
+    border-color: #007bff; /* Podświetlenie przy aktywnym polu */
+}
+
+/* Przycisk Wysyłki */
+#send-button {
+    background-color: #4CAF50; /* Zielony */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#send-button:hover {
+    background-color: #45a049;
+}
+
+#send-button:active {
+    transform: scale(0.98); /* Efekt kliknięcia */
+}
+
+/* === Media Queries (Responsywność) === */
+/* Style dla małych ekranów (np. telefony) */
+@media (max-width: 600px) {
+    #chat-container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    body {
+        justify-content: flex-start;
+    }
+    
+    #input-area {
+        padding: 8px 10px;
+    }
+
+    #message-input {
+        padding: 10px 15px;
+        margin-right: 8px;
+    }
+}

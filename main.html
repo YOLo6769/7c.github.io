@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonimowy Komunikator (Wymaga Backendu!)</title>
+    <style>
+        /* Stylizacja jest ta sama co poprzednio */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #chat-container {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+
+        #messages-history {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .message-wrapper {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message-me {
+            background-color: #007bff; /* Moja wiadomość */
+            color: white;
+            margin-left: auto; /* Wyrównanie do prawej */
+            margin-right: 0;
+        }
+        
+        .message-other {
+            background-color: #e5e5e5; /* Wiadomość innego użytkownika */
+            color: #333;
+            margin-right: auto; /* Wyrównanie do lewej */
+            margin-left: 0;
+        }
+        
+        .message-sender {
+            display: block;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-bottom: 3px;
+            /* Kolor anonimowego nadawcy */
+            color: #495057; 
+        }
+
+        .system-message {
+            text-align: center;
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        #input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        #send-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #send-button:hover {
+            background-color: #218838;
+        }
+    </style>
+    
+    </head>
+<body>
+
+    <div id="chat-container">
+        <div id="messages-history">
+            <div class="system-message">
+                Anonimowy kanał. Ten kod jest tylko frontendem i wymaga serwera.
+            </div>
+        </div>
+        <div id="input-area">
+            <input type="text" id="message-input" placeholder="Napisz anonimową wiadomość..." maxlength="250">
+            <button id="send-button">Wyślij</button>
+        </div>
+    </div>
+
+    <script>
+        // Logika JavaScript
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const messagesHistory = document.getElementById('messages-history');
+        
+        // --- Symulacja Anonimowego Użytkownika ---
+        // Generuje losowy, anonimowy ID użytkownika przy każdym wejściu
+        const anonymousID = 'Anonim ' + Math.floor(Math.random() * 900 + 100);
+        
+        // --- Główne Funkcje ---
+
+        function displayMessage(sender, text, isMe) {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('message-wrapper');
+            
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add(isMe ? 'message-me' : 'message-other');
+            
+            const senderSpan = document.createElement('span');
+            senderSpan.classList.add('message-sender');
+            senderSpan.textContent = sender;
+
+            // Dodaj nadawcę (tylko dla wiadomości od innych)
+            if (!isMe) {
+                messageElement.appendChild(senderSpan);
+            }
+
+            // Dodaj treść wiadomości
+            messageElement.innerHTML += text;
+            
+            wrapper.appendChild(messageElement);
+            messagesHistory.appendChild(wrapper);
+            
+            // Przewiń na dół
+            messagesHistory.scrollTop = messagesHistory.scrollHeight;
+        }
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+
+            if (text !== "") {
+                // --- KOD, KTÓRY FAKTYCZNIE WYSŁAŁBY WIADOMOŚĆ NA SERWER ---
+                
+                // const messageData = { sender: anonymousID, content: text };
+                // socket.emit('chat message', messageData); 
+                
+                // -----------------------------------------------------------
+                
+                // Tymczasowa symulacja: wyświetlamy tylko naszą wiadomość
+                displayMessage(anonymousID, text, true); 
+
+                messageInput.value = "";
+                
+                // Poniższy kod tylko symuluje, co by się stało, gdyby
+                // inna osoba wysłała wiadomość 1 sekundę później
+                // setTimeout(() => {
+                //     const otherID = 'Anonim ' + (Math.floor(Math.random() * 900 + 100));
+                //     displayMessage(otherID, 'Cześć, to inna osoba!', false); 
+                // }, 1000);
+            }
+        }
+
+        // --- Event Listenery ---
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Informacja o anonimowym ID
+        displayMessage('System', `Witaj, Twoje anonimowe ID to: ${anonymousID}.`, false);
+
+        // --- KOD DO POBIERANIA STARYCH WIADOMOŚCI Z SERWERA ---
+        // Tutaj musiałaby być funkcja, która po załadowaniu strony
+        // wysyła zapytanie do serwera (np. fetch('/history')) i
+        // pobiera stare wiadomości z bazy danych, a następnie 
+        // wywołuje displayMessage dla każdej z nich.
+        
+    </script>
+
+</body>
+</html>

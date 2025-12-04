@@ -6,22 +6,28 @@
     <title>Anonimowy Komunikator</title>
     
     <link rel="stylesheet" href="style.css"> 
+    
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     
     <div id="chat-container">
-        
         <div id="messages-history">
             </div>
         
         <div id="input-area">
-            <input type="text" id="message-input" placeholder="pisz i nie czekaj" maxlength="250">
-            <button id="send-button">ok</button>
+            <input type="text" id="message-input" placeholder="Napisz anonimową wiadomość..." maxlength="250">
+            <button id="send-button">Wyślij</button>
         </div>
-        
     </div>
+
     <script>
-        // Logika JavaScript 
+        // UWAGA: ZASTĄP PONIŻSZY ADRES WŁASNYM ADRESEM Z RENDER.COM
+        const RENDER_SERVER_URL = 'https://twoja-nazwa-serwera.onrender.com'; 
+        
+        // NAWIĄZANIE POŁĄCZENIA Z SERWEREM
+        const socket = io(RENDER_SERVER_URL); 
+        
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
         const messagesHistory = document.getElementById('messages-history');
@@ -29,7 +35,8 @@
         // Generuje losowy, anonimowy ID użytkownika
         const anonymousID = 'Anonim ' + Math.floor(Math.random() * 900 + 100);
         
-        // Funkcja do wyświetlania wiadomości
+        // --- FUNKCJE WYŚWIETLANIA I OBSŁUGI WIADOMOŚCI ---
+
         function displayMessage(sender, text, isMe) {
             const wrapper = document.createElement('div');
             wrapper.classList.add('message-wrapper');
@@ -38,23 +45,20 @@
             messageElement.classList.add('message');
             messageElement.classList.add(isMe ? 'message-me' : 'message-other');
             
-            // Dodawanie nadawcy
             const senderSpan = document.createElement('span');
             senderSpan.classList.add('message-sender');
             senderSpan.textContent = sender;
-            if (!isMe && sender !== 'System') { // System nie pokazuje nazwy w dymku
-                messageElement.appendChild(senderSpan);
-            }
-
-            // Dodawanie treści
-            messageElement.innerHTML += text;
             
-            // Jeśli to wiadomość systemowa, dodaj odpowiednią klasę i styl
+            // Logika dodawania nadawcy i wiadomości systemowych
             if (sender === 'System') {
                  messageElement.classList.add('system-message');
-                 // Wiadomości systemowe są dodawane bezpośrednio do historii, bez wrappera
+                 messageElement.innerHTML = text;
                  messagesHistory.appendChild(messageElement);
             } else {
+                 if (!isMe) {
+                    messageElement.appendChild(senderSpan);
+                 }
+                 messageElement.innerHTML += text;
                  wrapper.appendChild(messageElement);
                  messagesHistory.appendChild(wrapper);
             }
@@ -63,19 +67,54 @@
             messagesHistory.scrollTop = messagesHistory.scrollHeight;
         }
 
-        // Funkcja wysyłania wiadomości
         function sendMessage() {
             const text = messageInput.value.trim();
 
             if (text !== "") {
-                // Symulacja: wyświetlamy tylko naszą wiadomość
-                displayMessage(anonymousID, text, true); 
+                const messageData = { 
+                    sender: anonymousID, 
+                    content: text 
+                };
+                
+                // WYSYŁANIE WIADOMOŚCI DO SERWERA PRZEZ SOCKET.IO
+                socket.emit('chat message', messageData); 
 
                 messageInput.value = "";
             }
         }
+        
+        // --- SOCKET.IO HANDLERY (OBSŁUGA ZDARZEŃ Z SERWERA) ---
+        
+        // 1. ODBIERANIE WIADOMOŚCI OD SERWERA
+        socket.on('chat message', (msg) => {
+            const isMe = msg.sender === anonymousID;
+            displayMessage(msg.sender, msg.content, isMe); 
+        });
 
-        // Event Listenery
+        // 2. POBIERANIE HISTORII PRZY PODŁĄCZENIU
+        socket.on('history', (messages) => {
+             // Wyczyść historię przed załadowaniem
+             messagesHistory.innerHTML = '';
+             displayMessage('System', `Witaj! Twój ID to: ${anonymousID}. Ładowanie historii...`, 'system');
+
+             messages.forEach(msg => {
+                const isMe = msg.sender === anonymousID;
+                displayMessage(msg.sender, msg.content, isMe);
+            });
+        });
+        
+        // 3. Informacja o połączeniu
+        socket.on('connect', () => {
+             displayMessage('System', `Połączono z serwerem.`, 'system');
+        });
+
+        // 4. Informacja o błędzie
+        socket.on('disconnect', () => {
+             displayMessage('System', `Rozłączono z serwerem.`, 'system');
+        });
+
+
+        // --- EVENT LISTENERY ---
         sendButton.addEventListener('click', sendMessage);
         
         messageInput.addEventListener('keypress', (event) => {
@@ -83,12 +122,8 @@
                 sendMessage();
             }
         });
-
-        // WYŚWIETLENIE JEDNEJ WIADOMOŚCI SYSTEMOWEJ NA START
-        displayMessage('System', `twoja tymczasowa nazwa to: ${anonymousID}. narazie błedów bedzie.`, 'system');
         
     </script>
 
 </body>
 </html>
-
